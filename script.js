@@ -45,3 +45,14 @@ function operate (operator,a,b) {
         return division(a,b);
     }
 }
+
+//declaring variables and calculator state
+
+let firstNum  = "";
+let secondNum = "";
+let operator  = "";
+
+let currentInput = "";
+let previousCalc = "";
+let resultShown  =  false;
+
