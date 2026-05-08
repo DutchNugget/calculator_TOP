@@ -24,5 +24,24 @@ function division (a,b) {
 
 
 function percentage (a) {
-    return a / 100
+    return a / 100;
+}
+
+//Operator function
+function operate (operator,a,b) {
+    if (operator === "+") {
+        return addition(a,b);
+
+    } else if (operator === "-") {
+        return subtraction(a,b);
+
+    } else if (operator === "*") {
+        return multiplication(a,b)
+
+    } else if (operator === "%") {
+        return percentage(a);
+
+    } else if (operator === "÷") {
+        return division(a,b);
+    }
 }
