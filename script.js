@@ -41,7 +41,7 @@ function operate (operator,a,b) {
     } else if (operator === "%") {
         return percentage(a);
 
-    } else if (operator === "÷") {
+    } else if (operator === "/") {
         return division(a,b);
     }
 }
@@ -56,3 +56,12 @@ let currentInput = "";
 let previousCalc = "";
 let resultShown  =  false;
 
+//adding buttons and event listeners
+
+const operatorButtons = document.querySelectorAll("[data-operator]");
+
+    operatorButtons.forEach((button)=> {
+        button.addEventListener("click", function(){
+            console.log(button.textContent)
+        })
+    });
