@@ -17,6 +17,7 @@ body {
 }
 
 .calculatorContainer {
+
     width: 320px;
     background-color: #f5f5f5;
     border-radius: 35px;
@@ -28,14 +29,31 @@ body {
 }
 
 .screen {
-
+    
     height: 180px;
     background-color: #2f2f2f;
     color: white;
     padding: 25px;
-    font-size: 2em;
     text-align: end;
 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 10px;
+
+}
+
+.previousDisplay {
+    font-size: 1rem;
+    opacity: 0.7;
+    min-height: 24px;
+
+}
+
+.currentDisplay {
+    font-size: 2em;
+    min-height: 45px;
+    
 }
 
 .buttonContainer {
