@@ -72,7 +72,7 @@ function showResult(result) {
         currentExpression = "Error";
 
         updateDisplay();
-        resetState();
+        stateToZero()
         return;
 
     } else {
@@ -202,7 +202,6 @@ operatorButtons.forEach((button) => {
 
 numberButtons.forEach((button) => {
     button.addEventListener("click", function () {
-
         const digit = button.textContent;
 
         if (resultShown) {
@@ -213,23 +212,26 @@ numberButtons.forEach((button) => {
             return;
         }
 
-        // replace leading zero
-        if (currentInput === "0" && digit !== "0" && !currentInput.includes(".")) {
+        if (currentInput.length >= 12) {
+            return;
+        }
+
+        if (currentInput === "0" && digit === "0") {
+            return;
+        }
+
+        if (currentInput === "0" && digit !== "0") {
             currentInput = digit;
             currentExpression = currentExpression.slice(0, -1) + digit;
-
             updateDisplay();
             return;
         }
 
-        // normal append
         currentInput += digit;
         currentExpression += digit;
-
         updateDisplay();
     });
 });
-
 
 ClearAllButton.addEventListener("click", function () {
     stateToZero()
@@ -266,7 +268,7 @@ equalsButton.addEventListener("click", function () {
         previousPreviousDisplay.textContent = previousDisplay.textContent
         previousDisplay.textContent = currentExpression;
         firstNum = currentExpression;
-        const result = firstNum;
+        const result = Number(firstNum);
         showResult(result)
         return
 
@@ -281,3 +283,49 @@ equalsButton.addEventListener("click", function () {
         return;
     }
 })
+
+//adding keyboard support: 
+
+document.addEventListener("keydown", function (event) {
+    const key = event.key;
+
+    if (key >= "0" && key <= "9") {
+        document.querySelector(`[data-number="${key}"]`).click();
+    }
+
+    if (key === ".") {
+        document.querySelector(`[data-number="."]`).click();
+    }
+
+    if (key === "+") {
+        document.querySelector(`[data-operator="+"]`).click();
+    }
+
+    if (key === "-") {
+        document.querySelector(`[data-operator="-"]`).click();
+    }
+
+    if (key === "*") {
+        document.querySelector(`[data-operator="*"]`).click();
+    }
+
+    if (key === "/") {
+        document.querySelector(`[data-operator="/"]`).click();
+    }
+
+    if (key === "%") {
+        document.querySelector(`[data-operator="%"]`).click();
+    }
+
+    if (key === "Enter" || key === "=") {
+        equalsButton.click();
+    }
+
+    if (key === "Backspace") {
+        backSpaceButton.click();
+    }
+
+    if (key === "Escape") {
+        ClearAllButton.click();
+    }
+});
