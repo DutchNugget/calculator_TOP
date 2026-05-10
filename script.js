@@ -67,7 +67,7 @@ function updateDisplay () {
 
 //helper function for updating result: 
 function showResult(result) {
-    fixedResult = result.toFixed(6)
+    const fixedResult = result.toFixed(6)
     currentExpression = String(fixedResult);
     currentInput = String(fixedResult);
 
