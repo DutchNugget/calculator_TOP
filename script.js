@@ -67,13 +67,23 @@ function updateDisplay () {
 
 //helper function for updating result: 
 function showResult(result) {
-    const fixedResult = result.toFixed(6)
+    if (result === "Error"){
+        currentInput = "0";
+        currentExpression = "Error";
+        
+        updateDisplay();
+        resetState();
+        return;
+
+    } else {
+    const fixedResult = Number.isInteger(result) ? result: Number(result.toFixed(6))
     currentExpression = String(fixedResult);
     currentInput = String(fixedResult);
 
     updateDisplay();
     resetState();
     return;
+    }
 }
 
 //reset state
@@ -226,22 +236,28 @@ ClearAllButton.addEventListener("click", function (){
 })
 
 
-backSpaceButton.addEventListener("click", function (){
-    if (currentInput.length === 1){
-        currentInput = "0";
-        currentExpression = "0";
+backSpaceButton.addEventListener("click", function () {
+
+    const lastChar = currentExpression.slice(-1);
+    const operators = ["+", "-", "×", "÷", "%"];
+
+    // stop at operator
+    if (operators.includes(lastChar)) {
+        return;
+
+    } else if (currentInput.length === 1) {
+        currentInput = "";
+        currentExpression = currentExpression.slice(0, -1);
         updateDisplay();
         return;
 
     } else {
-        currentInput = currentInput.slice(0,-1);
-        currentExpression = currentExpression.slice(0,-1);
+        currentInput = currentInput.slice(0, -1);
+        currentExpression = currentExpression.slice(0, -1);
         updateDisplay();
-        return;
-        
     }
-})
 
+});
 //we handle all updating and clearing of input/expression/display here to keep the operate function clean. 
 
 equalsButton.addEventListener("click", function(){
