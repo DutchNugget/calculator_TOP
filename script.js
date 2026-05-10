@@ -30,6 +30,7 @@ function percentage (a) {
 //Operator function
 function operate (operator,a,b) {
     if (operator === "+") {
+
         return addition(a,b);
 
     } else if (operator === "-") {
@@ -57,13 +58,13 @@ let currentExpression = "0"
 let previousCalc = "";
 let resultShown  =  false;
 
-
 //getting screen elements and setting currentdisplay to current input.
-
 const currentDisplay  = document.querySelector(".currentDisplay")
     updateDisplay();
 
 const previousDisplay = document.querySelector(".previousDisplay")
+
+const previousPreviousDisplay = document.querySelector(".previousPreviousDisplay")
 
 //helper function for updating display
 
@@ -71,7 +72,22 @@ function updateDisplay () {
     currentDisplay.textContent = currentExpression
 }
 
+//helper function for updating result: 
+function showResult(result) {
+    currentExpression = String(result);
+    currentInput = String(result);
+
+    updateDisplay();
+
+    firstNum = "";
+    secondNum = "";
+    operator = "";
+    resultShown = true;
+}
+
 //adding buttons and event listeners
+/*the operator function clears the currentinput once an operator is set, and runs the operate function if a second operator 
+is chosen while first number is populated, and sets the current input to secondnumber. This way we prevent overcomplicating the function*/
 
 const operatorButtons = document.querySelectorAll("[data-operator]");
 
@@ -87,7 +103,7 @@ const operatorButtons = document.querySelectorAll("[data-operator]");
                 updateDisplay()
                 return;
                 
-            } else if (currentExpression === "0" && operatorValue !== "-") {
+            } else if ((currentExpression === "0" ) && (operatorValue !== "-" ) && (firstNum.length = 0)) {
                 firstNum = currentInput;
                 operator = button.dataset.operator;
                 currentExpression += operatorValue;
@@ -95,25 +111,57 @@ const operatorButtons = document.querySelectorAll("[data-operator]");
                 updateDisplay();
                 return; 
 
-            } else if (lastChar !== operatorValue && operators.includes(lastChar)) {
+            } else if (lastChar !== operatorValue && operators.includes(lastChar) && operatorValue !== "-") {
                 currentExpression = currentExpression.slice(0, -1) + operatorValue;
                 operator = button.dataset.operator;
                 updateDisplay();
                 return;
 
+                
+            } else if (operators.includes(lastChar) && operatorValue === "-") {
+                const secondLastChar =
+                currentExpression.slice(-2, -1);
+                if (lastChar === "-"  && operators.includes(secondLastChar)) {
+                    return;
+                }
+                currentInput = "-";
+                currentExpression += operatorValue
+                updateDisplay()
+                return;
+
+          
             } else if (firstNum.length > 0 && operator.length > 0 && currentInput.length > 0) {
                 secondNum = currentInput;
-                return operate(operator, Number(firstNum), Number(secondNum))
+                
+                previousPreviousDisplay.textContent = previousDisplay.textContent;
+                previousDisplay.textContent         = currentExpression;
+                
+                const result      = operate(operator, Number(firstNum), Number(secondNum));
+                showResult(result);
 
             } else if (operatorValue === lastChar) {
                 return;
 
-            } else {
+            } else if ( operatorValue === "%") {
+                firstNum = currentInput
+                operator = button.dataset.operator 
+               
+
+                previousPreviousDisplay.textContent = previousDisplay.textContent
+                previousDisplay.textContent         = currentExpression;
+                
+                const result      = operate(operator, Number(firstNum))
+                showResult(result)
+            }
+            
+            else {
                 firstNum = currentInput;
                 currentInput = ""
                 operator = button.dataset.operator;
                 currentExpression += operatorValue;
                 updateDisplay()
+                resultShown = false;
+                return;
 
             }
      } )}
@@ -122,30 +170,42 @@ const operatorButtons = document.querySelectorAll("[data-operator]");
 
 const numberButtons   = document.querySelectorAll("[data-number]");
 
-    numberButtons.forEach((button)=> {
-        button.addEventListener("click", function(){
+    numberButtons.forEach((button) => {
+        button.addEventListener("click", function () {
 
-            if (currentInput === "0"){
-                currentInput = button.textContent;
-                currentExpression = button.textContent
-                updateDisplay();
-                return;
+            const digit = button.textContent;
 
-            } else if (currentDisplay.textContent.length >= 12){
-                return
-
-            } else if (currentInput === "0" && button.textContent === "0"){
-                return;
-
-            } else {
-                currentInput += button.textContent;
-                currentExpression += button.textContent;
+            if (resultShown) {
+                currentInput = digit;
+                currentExpression = digit;
+                resultShown = false;
                 updateDisplay();
                 return;
             }
-        })
-    })
 
+            // replace leading zero
+            if (
+                currentInput === "0" &&
+                digit !== "0" &&
+                !currentInput.includes(".")
+            ) {
+
+                currentInput = digit;
+
+                currentExpression =
+                    currentExpression.slice(0, -1) + digit;
+
+                updateDisplay();
+                return;
+            }
+
+            // normal append
+            currentInput += digit;
+            currentExpression += digit;
+
+            updateDisplay();
+        });
+    });
 const ClearAllButton  = document.querySelector("[data-action='clear']")
     
     ClearAllButton.addEventListener("click", function (){
@@ -158,10 +218,25 @@ const backSpaceButton = document.querySelector("[data-action='backspace']")
         console.log(backSpaceButton.textContent)
     })
 
+    //we handle all updating and clearing of input/expression/display here to keep the operate function clean. 
 const equalsButton    = document.querySelector("[data-action='equals']")
 
-    equalsButton.addEventListener("click", function () {
-        console.log(equalsButton.textContent)
+    equalsButton.addEventListener("click", function(){
+        if (!secondNum && !operator){
+            previousPreviousDisplay.textContent = previousDisplay.textContent
+            previousDisplay.textContent         = currentExpression;
+            firstNum = currentExpression
+            const result = firstNum
+            showResult(result)
+            return
+        } else {
+        secondNum                           = currentInput
+        previousPreviousDisplay.textContent = previousDisplay.textContent
+        previousDisplay.textContent         = currentExpression;
+        
+        const result      = operate(operator, Number(firstNum), Number(secondNum))
+        showResult(result)
+
+        return;
+        }
     })
-
-
