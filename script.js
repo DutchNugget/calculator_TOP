@@ -1,54 +1,13 @@
-// Math functions 
-function addition (a,b) {
-    return a + b;
-}
-
-
-function subtraction (a,b) {
-    return a - b;
-}
-
-
-function multiplication (a,b) {
-    return a * b;
-}
-
-
-function division (a,b) {
-    if (b === 0) {
-        return "Error"
-    }
-
-    return a / b;
-}
-
-
-function percentage (a) {
-    return a / 100;
-}
-
-//Operator function
-function operate (operator,a,b) {
-    if (operator === "+") {
-
-        return addition(a,b);
-
-    } else if (operator === "-") {
-        return subtraction(a,b);
-
-    } else if (operator === "*") {
-        return multiplication(a,b)
-
-    } else if (operator === "%") {
-        return percentage(a);
-
-    } else if (operator === "/") {
-        return division(a,b);
-    }
+//Operator function with an operations object to simplify the if else statement block i had here. 
+const operations = {
+    "+" : addition,
+    "-" : subtraction,
+    "/" : division,
+    "%" : percentage,
+    "*" : multiplication
 }
 
 //declaring variables and calculator state
-
 let firstNum  = "";
 let secondNum = "";
 let operator  = "";
@@ -58,13 +17,47 @@ let currentExpression = "0"
 let previousCalc = "";
 let resultShown  =  false;
 
-//getting screen elements and setting currentdisplay to current input.
+//getting all DOM elements
 const currentDisplay  = document.querySelector(".currentDisplay")
-    updateDisplay();
-
 const previousDisplay = document.querySelector(".previousDisplay")
-
 const previousPreviousDisplay = document.querySelector(".previousPreviousDisplay")
+const operatorButtons = document.querySelectorAll("[data-operator]");
+const numberButtons   = document.querySelectorAll("[data-number]");
+const ClearAllButton  = document.querySelector("[data-action='clear']");
+const backSpaceButton = document.querySelector("[data-action='backspace']");
+const equalsButton = document.querySelector("[data-action='equals']");
+
+//initializing display 0
+updateDisplay();
+
+// Math functions 
+function addition (a,b) {
+    return a + b;
+}
+
+function subtraction (a,b) {
+    return a - b;
+}
+
+function multiplication (a,b) {
+    return a * b;
+}
+
+function division (a,b) {
+    if (b === 0) {
+        return "Error"
+    }
+
+    return a / b;
+}
+
+function percentage (a) {
+    return a / 100;
+}
+
+
+
+
 
 //helper function for updating display
 
@@ -74,169 +67,200 @@ function updateDisplay () {
 
 //helper function for updating result: 
 function showResult(result) {
-    currentExpression = String(result);
-    currentInput = String(result);
+    fixedResult = result.toFixed(6)
+    currentExpression = String(fixedResult);
+    currentInput = String(fixedResult);
 
     updateDisplay();
+    resetState();
+    return;
+}
 
+//reset state
+function resetState () {
     firstNum = "";
     secondNum = "";
     operator = "";
     resultShown = true;
+    return;
 }
 
-//adding buttons and event listeners
-/*the operator function clears the currentinput once an operator is set, and runs the operate function if a second operator 
-is chosen while first number is populated, and sets the current input to secondnumber. This way we prevent overcomplicating the function*/
+//stateToZero 
 
-const operatorButtons = document.querySelectorAll("[data-operator]");
+function stateToZero () {
+    resetState()
+    resultShown = false;
+    currentInput = "0";
+    currentExpression = "0";
+    previousCalc = "";
+    previousDisplay.textContent="";
+    previousPreviousDisplay.textContent ="";
+    updateDisplay();
+    return;
+}
 
-    operatorButtons.forEach((button)=> {
-        button.addEventListener("click", function(){
-            const operatorValue = button.textContent
-            const lastChar = currentDisplay.textContent.slice(-1);
-            const operators = ["×", "÷","-","%","+"]
+//function that calls math functions
 
-            if (currentExpression === "0" && operatorValue ==="-") {
-                currentInput = "-"
-                currentExpression ="-";
-                updateDisplay()
-                return;
-                
-            } else if ((currentExpression === "0" ) && (operatorValue !== "-" ) && (firstNum.length = 0)) {
-                firstNum = currentInput;
-                operator = button.dataset.operator;
-                currentExpression += operatorValue;
-                currentInput = ""
-                updateDisplay();
-                return; 
 
-            } else if (lastChar !== operatorValue && operators.includes(lastChar) && operatorValue !== "-") {
-                currentExpression = currentExpression.slice(0, -1) + operatorValue;
-                operator = button.dataset.operator;
-                updateDisplay();
-                return;
+function operate (operator,a,b){
+    return operations[operator](a,b);
+}
 
-                
-            } else if (operators.includes(lastChar) && operatorValue === "-") {
-                const secondLastChar =
-                currentExpression.slice(-2, -1);
-                if (lastChar === "-"  && operators.includes(secondLastChar)) {
-                    return;
-                }
-                currentInput = "-";
-                currentExpression += operatorValue
-                updateDisplay()
-                return;
 
-          
-            } else if (firstNum.length > 0 && operator.length > 0 && currentInput.length > 0) {
-                secondNum = currentInput;
-                
-                previousPreviousDisplay.textContent = previousDisplay.textContent;
-                previousDisplay.textContent         = currentExpression;
-                
-                const result      = operate(operator, Number(firstNum), Number(secondNum));
-                showResult(result);
+//eventlisteners with enclosed functions
+operatorButtons.forEach((button)=> {
+    button.addEventListener("click", function(){
+        const operatorValue = button.textContent
+        const lastChar = currentExpression.slice(-1);
+        const operators = ["×", "÷","-","%","+"]
 
-            } else if (operatorValue === lastChar) {
-                return;
-
-            } else if ( operatorValue === "%") {
-                firstNum = currentInput
-                operator = button.dataset.operator 
-               
-
-                previousPreviousDisplay.textContent = previousDisplay.textContent
-                previousDisplay.textContent         = currentExpression;
-                
-                const result      = operate(operator, Number(firstNum))
-                showResult(result)
-            }
+        if (currentExpression === "0" && operatorValue ==="-") {
+            currentInput = "-"
+            currentExpression ="-";
+            updateDisplay()
+            return;
             
-            else {
-                firstNum = currentInput;
-                currentInput = ""
-                operator = button.dataset.operator;
-                currentExpression += operatorValue;
-                updateDisplay()
-                resultShown = false;
-                return;
+        } else if ((currentExpression === "0" ) && (operatorValue !== "-" ) && (firstNum.length === 0)) {
+            firstNum = currentInput;
+            operator = button.dataset.operator;
+            currentExpression += operatorValue;
+            currentInput = ""
+            updateDisplay();
+            return; 
 
-            }
-     } )}
-   )
+        } else if (lastChar !== operatorValue && operators.includes(lastChar) && operatorValue !== "-") {
+            currentExpression = currentExpression.slice(0, -1) + operatorValue;
+            operator = button.dataset.operator;
+            updateDisplay();
+            return;
 
-
-const numberButtons   = document.querySelectorAll("[data-number]");
-
-    numberButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-
-            const digit = button.textContent;
-
-            if (resultShown) {
-                currentInput = digit;
-                currentExpression = digit;
-                resultShown = false;
-                updateDisplay();
+            
+        } else if (operators.includes(lastChar) && operatorValue === "-") {
+            const secondLastChar =
+            currentExpression.slice(-2, -1);
+            if (lastChar === "-"  && operators.includes(secondLastChar)) {
                 return;
             }
 
-            // replace leading zero
-            if (
-                currentInput === "0" &&
-                digit !== "0" &&
-                !currentInput.includes(".")
-            ) {
+            currentInput = "-";
+            currentExpression += operatorValue
+            updateDisplay()
+            return;
 
-                currentInput = digit;
+        
+        } else if (firstNum.length > 0 && operator.length > 0 && currentInput.length > 0) {
+            secondNum = currentInput;
+            
+            previousPreviousDisplay.textContent = previousDisplay.textContent;
+            previousDisplay.textContent         = currentExpression;
+            
+            const result      = operate(operator, Number(firstNum), Number(secondNum));
+            showResult(result);
 
-                currentExpression =
-                    currentExpression.slice(0, -1) + digit;
+        } else if (operatorValue === lastChar) {
+            return;
 
-                updateDisplay();
-                return;
-            }
+        } else if ( operatorValue === "%") {
+            firstNum = currentInput;
+            operator = button.dataset.operator;
+            
 
-            // normal append
-            currentInput += digit;
-            currentExpression += digit;
+            previousPreviousDisplay.textContent = previousDisplay.textContent;
+            previousDisplay.textContent         = currentExpression;
+            
+            const result      = operate(operator, Number(firstNum))
+            showResult(result)
+            return;
+        }
+        
+        else {
+            firstNum = currentInput;
+            currentInput = ""
+            operator = button.dataset.operator;
+            currentExpression += operatorValue;
+            updateDisplay();
+            resultShown = false;
+            return;
+
+        }
+    } )}
+)
+
+
+
+
+numberButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+
+        const digit = button.textContent;
+
+        if (resultShown) {
+            currentInput = digit;
+            currentExpression = digit;
+            resultShown = false;
+            updateDisplay();
+            return;
+        }
+
+        // replace leading zero
+        if (currentInput === "0" && digit !== "0" && !currentInput.includes(".")){
+            currentInput = digit;
+            currentExpression = currentExpression.slice(0, -1) + digit;
 
             updateDisplay();
-        });
+            return;
+        }
+
+        // normal append
+        currentInput += digit;
+        currentExpression += digit;
+
+        updateDisplay();
     });
-const ClearAllButton  = document.querySelector("[data-action='clear']")
-    
-    ClearAllButton.addEventListener("click", function (){
-        console.log(ClearAllButton.textContent)
-    })
+});
 
-const backSpaceButton = document.querySelector("[data-action='backspace']")
 
-    backSpaceButton.addEventListener("click", function (){
-        console.log(backSpaceButton.textContent)
-    })
+ClearAllButton.addEventListener("click", function (){
+    stateToZero()
+    return;  
+})
 
-    //we handle all updating and clearing of input/expression/display here to keep the operate function clean. 
-const equalsButton    = document.querySelector("[data-action='equals']")
 
-    equalsButton.addEventListener("click", function(){
-        if (!secondNum && !operator){
-            previousPreviousDisplay.textContent = previousDisplay.textContent
-            previousDisplay.textContent         = currentExpression;
-            firstNum = currentExpression
-            const result = firstNum
-            showResult(result)
-            return
-        } else {
-        secondNum                           = currentInput
+backSpaceButton.addEventListener("click", function (){
+    if (currentInput.length === 1){
+        currentInput = "0";
+        currentExpression = "0";
+        updateDisplay();
+        return;
+
+    } else {
+        currentInput = currentInput.slice(0,-1);
+        currentExpression = currentExpression.slice(0,-1);
+        updateDisplay();
+        return;
+        
+    }
+})
+
+//we handle all updating and clearing of input/expression/display here to keep the operate function clean. 
+
+equalsButton.addEventListener("click", function(){
+    if (!secondNum && !operator){
         previousPreviousDisplay.textContent = previousDisplay.textContent
         previousDisplay.textContent         = currentExpression;
-        
-        const result      = operate(operator, Number(firstNum), Number(secondNum))
+        firstNum = currentExpression;
+        const result = firstNum;
         showResult(result)
+        return
 
-        return;
-        }
-    })
+    } else {
+    secondNum                           = currentInput
+    previousPreviousDisplay.textContent = previousDisplay.textContent
+    previousDisplay.textContent         = currentExpression;
+    
+    const result      = operate(operator, Number(firstNum), Number(secondNum))
+    showResult(result)
+
+    return;
+    }
+})
