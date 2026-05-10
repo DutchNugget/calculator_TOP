@@ -16,6 +16,8 @@ let currentInput = "0";
 let currentExpression = "0"
 let previousCalc = "";
 let resultShown = false;
+//initializing display 
+updateDisplay();
 
 //getting all DOM elements
 const currentDisplay = document.querySelector(".currentDisplay")
@@ -27,8 +29,6 @@ const ClearAllButton = document.querySelector("[data-action='clear']");
 const backSpaceButton = document.querySelector("[data-action='backspace']");
 const equalsButton = document.querySelector("[data-action='equals']");
 
-//initializing display 0
-updateDisplay();
 
 // Math functions 
 function addition(a, b) {
