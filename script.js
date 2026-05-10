@@ -79,6 +79,7 @@ const operatorButtons = document.querySelectorAll("[data-operator]");
         button.addEventListener("click", function(){
             const operatorValue = button.textContent
             const lastChar = currentDisplay.textContent.slice(-1);
+            const operators = ["×", "÷","-","%","+"]
 
             if (currentExpression === "0" && operatorValue ==="-") {
                 currentInput = "-"
@@ -93,6 +94,27 @@ const operatorButtons = document.querySelectorAll("[data-operator]");
                 currentInput = ""
                 updateDisplay();
                 return; 
+
+            } else if (lastChar !== operatorValue && operators.includes(lastChar)) {
+                currentExpression = currentExpression.slice(0, -1) + operatorValue;
+                operator = button.dataset.operator;
+                updateDisplay();
+                return;
+
+            } else if (firstNum.length > 0 && operator.length > 0 && currentInput.length > 0) {
+                secondNum = currentInput;
+                return operate(operator, Number(firstNum), Number(secondNum))
+
+            } else if (operatorValue === lastChar) {
+                return;
+
+            } else {
+                firstNum = currentInput;
+                currentInput = ""
+                operator = button.dataset.operator;
+                currentExpression += operatorValue;
+                updateDisplay()
+
             }
      } )}
    )
