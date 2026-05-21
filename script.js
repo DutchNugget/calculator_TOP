@@ -28,8 +28,7 @@ const ClearAllButton = document.querySelector("[data-action='clear']");
 const backSpaceButton = document.querySelector("[data-action='backspace']");
 const equalsButton = document.querySelector("[data-action='equals']");
 
-//initializing display 
-updateDisplay();
+
 
 // Math functions 
 function addition(a, b) {
@@ -65,6 +64,9 @@ function percentage(a) {
 function updateDisplay() {
     currentDisplay.textContent = currentExpression
 }
+
+//initializing display 
+updateDisplay();
 
 //helper function for updating result: 
 function showResult(result) {
